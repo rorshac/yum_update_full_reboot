@@ -15,23 +15,6 @@
         update_cache: yes
         disablerepo: "*"
         enablerepo: "rhel*,clone*"
-    # -
-    #   copy:
-    #     src: /etc/fstab
-    #     dest: /etc/fstab.pre_patch
-    #     remote_src: yes
-    #   name: "save original fstab"
-
-    # -
-    #   copy:
-    #     src: /etc/fstab
-    #     dest: /etc/fstab.pre_patch.spare
-    #     remote_src: yes
-    #   name: "create extra fstab"
-
-    # -
-    #   shell: "/bin/awk '!/^ *#/ && !/^$/' /etc/fstab.pre_patch |/bin/awk '$5=\"0\", $6=\"0\"' > /etc/fstab"
-    #   name: "edit fstab to not fs check"
 
     - name: "Prevent fsck"
       file:
@@ -40,22 +23,7 @@
 
     - name: "Restart server"
       reboot:
-    #   async: 1
-    #   shell: sleep 2 && /sbin/shutdown -r now "Ansible system package upgraded"
-    #   name: "Restart server"
-    #   poll: 0
 
-    # -
-    #   local_action: "wait_for host={{ ansible_ssh_host }} state=started"
-    #   name: "waiting for server to come back after boot"
-
-    # -
-    #   copy:
-    #     src: /etc/fstab.pre_patch
-    #     dest: /etc/fstab
-    #     remote_src: yes
-    #   name: "put fstab back"
-
-    - name: "Update tools"
+    - name: "Update VMtools"
       command: "/usr/bin/vmware-config-tools.pl -d"
-      when: ansible_virtualization_type == "VMware" and ansible_distribution_major_version == "6"
+      when: ansible_distribution_major_version == "6" and tools_exist.stat.exists
